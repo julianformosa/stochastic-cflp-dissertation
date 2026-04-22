@@ -1,2 +1,4 @@
 # stochastic-cflp-dissertation
-Modelling and solving the stochastic Competitive Facility Location Problem using exact, heuristic and metaheuristic methods.
+
+This repository holds the scripts used to produce the results for my undergraduate thesis, "Solving the Stochastic Competitive Facility Location Problem using Metaheuristic Algorithms."
+
