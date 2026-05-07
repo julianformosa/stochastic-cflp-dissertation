@@ -8,11 +8,8 @@ from generate_instances import *
 # Calculate size of K and generate it
 print("Generating K...")
 maximum_ranges = []
-len_K = 1
 for v in vertices_unoccupied:
-    len_K *= (MAX_QUALITY_INDICES[v] + 1)
     maximum_ranges.append(range(MAX_QUALITY_INDICES[v] + 1))
-print(f"K contains {len_K} elements\n")
 
 K = [0] * len_K
 for i, sequence in enumerate(
@@ -61,7 +58,7 @@ def find_follower_exact(k_leader: dict, s: int) -> dict:
     
     # If Leader has taken up all unoccupied vertices, then Follower has nowhere to build on
     if all(k_leader[v] != 0 for v in vertices_unoccupied):
-        return {v: 0 for v in vertices_unoccupied}  
+        return {v: 0 for v in vertices_unoccupied}
     
     # Reduce the search space to the actions given by K_follower()
     feasible_actions = K_follower(k_leader, s)
@@ -132,10 +129,11 @@ def find_leader_exact() -> dict:
         # Calculate Leader's resulting objective function value
         objective = master_objective_fun_k(k, corresponding_response)
         
-        if objective > best_objective and leader_budget_satisfied_k(k, corresponding_response):
-            # Action is better and also feasible
+        if objective >= best_objective and leader_budget_satisfied_k(k, corresponding_response):
+            # Action is feasible and as good as best action found so far
             best_action = k
             best_objective = objective
+            print(best_objective, best_action)
         
         actions_evaluated += 1
         # Print progress for debugging purposes
