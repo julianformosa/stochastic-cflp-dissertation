@@ -4,12 +4,11 @@
 import osmnx as ox
 import random
 import networkx as nx
-from functools import cache
 import math
 
 
-num_vertices_unoccupied = 60  # Choose number of unoccupied vertices
-random.seed(5)  # Use seed 22 for parameter tuning, and seeds 1-5 for tests
+num_vertices_unoccupied = 30  # 8 for parameter tuning, 10, 30, 60 for tests
+random.seed(90)  # 22 for parameter tuning, 5, 25, 60, 80 and 90 for tests
 
 
 # PLAYING FIELD ########################################################################
@@ -36,15 +35,15 @@ G = ox.truncate.largest_component(G, strongly=True)
 # )
 
 # Select nodes for Follower's existing chargers
-longitudes = [14.505842, 14.509751, 14.4990198644346]  # Latitudes of existing chargers
-latitudes = [35.908752, 35.910208, 35.9076972438659]  # Longitudes of existing chargers
+longitudes = [14.505842, 14.509751, 14.4990198644346]
+latitudes = [35.908752, 35.910208, 35.9076972438659]
 nodes_occupied = []
 for i in range(3):
     # Add to nodes_occupied the closest node to the existing charger's coordinates
     nodes_occupied.append(ox.distance.nearest_nodes(G, X=longitudes[i], Y=latitudes[i]))
 
-# Make sure that each example uses different nodes for the unoccupied vertices, even
-# when using the same seed, by calling random.random() a different number of times.
+# By calling random.random() a different number of times depending on the size, we
+# ensure that every combination of seed + size uses different nodes as the unoccupied vertices.
 for _ in range(num_vertices_unoccupied):
     random.random()
 
@@ -74,6 +73,7 @@ vertices_occupied = list(range(1, num_vertices_occupied + 1))
 # Vertices V_F + 1, ..., V_U are unoccupied
 vertices_unoccupied = list(range(num_vertices_occupied + 1, num_vertices + 1))
 
+# vertices = [1, 2, ..., V]
 vertices = list(range(1, num_vertices + 1))
 
 # Create a dictionary to store the graph's node index for all of our vertices
@@ -107,6 +107,7 @@ def distance(start_vertex: int, end_vertex: int) -> float:
     return distances[(start_vertex, end_vertex)]
 
 
+# Q = [1, 2, 3, 4]
 quality_indices = list(range(1, 5))
 num_quality_indices = 4
 
@@ -134,7 +135,6 @@ QUALITY_LEVELS = {1: 20, 2: 30, 3: 200, 4: 250}
 BUDGET_LEADER = 80_000
 BUDGETS_FOLLOWER = {1: 40_000, 2: 80_000, 3: 120_000, 4: 160_000}
 SCENARIO_PROBABILITIES = {1: 0.3, 2: 0.4, 3: 0.2, 4: 0.1}
-MAX_DEMANDS = {v: math.ceil(816 / num_vertices) for v in vertices}
 N = 6
 ALPHA = 1
 BETA = 2
@@ -146,9 +146,15 @@ PHI = 1.25
 THETA = 2
 RHO = 0.95
 
+# Locate each of the 816 consumers at a random vertex
+MAX_DEMANDS = {v: 0 for v in vertices}
+for _ in range(816):
+    chosen_vertex = random.choice(vertices)
+    MAX_DEMANDS[chosen_vertex] += 1
+
 
 # HOW WE ENCODE ACTIONS AND STRATEGIES -------------------------------------------------
-# The player action (1, 4, 2) in K is encoded using the dictionary {1: 1, 2: 4, 3: 2}.
+# The action (1, 4, 2) in K is encoded using the dictionary {1: 1, 2: 4, 3: 2}.
 # A Follower strategy is encoded as a dictionary with keys 1, ..., S representing the
 # scenarios, and each key corresponds to the action Follower would play under that scenario.
 # --------------------------------------------------------------------------------------
@@ -162,7 +168,6 @@ def chi_0(n: float) -> int:
     
 
 # Attractions
-@cache  # Keep attractions in cache since they are used often
 def attraction(u: int, v: int, q: int) -> float:
     """ The attraction felt by vertex u to a facility on vertex v with quality index q"""
     return QUALITY_LEVELS[q] / (ALPHA + distance(u, v)) ** BETA
@@ -416,3 +421,8 @@ for u in vertices:
         distances[(u, v)] = distance(u, v)
 print("...Distances found")
 print("")
+
+len_K = 1
+for v in vertices_unoccupied:
+    len_K *= (MAX_QUALITY_INDICES[v] + 1)
+print(f"K contains {len_K} elements")
