@@ -185,7 +185,7 @@ def recombination(k_1: dict, k_2: dict) -> dict:
 
 def mutation(k: dict, player: str, k_leader) -> dict:
     m_1 = random.random()
-    if m_1 < MUTATION_PROBABILITY: 
+    if m_1 < MUTATION_PROBABILITY:
         feasible = False
         while not feasible:
             m_2 = random.choice([1, 2, 3, 4])
@@ -469,20 +469,6 @@ def find_leader_MA() -> dict:
 
 # PARAMETER TUNING #####################################################################
 
-# Solving exactly only needs to be done once, so that the exact solving time can be found
-# print("")
-# print(f"Solving exactly...")
-# exact_time_start = time.perf_counter()
-# leader_exact = find_leader_exact()
-# exact_time_end = time.perf_counter()
-# exact_response = {s: find_follower_exact(leader_exact, s) for s in scenarios}
-# exact_ofv = master_objective_fun_k(
-#     leader_exact, {s: exact_response[s] for s in scenarios}
-# )
-# print("")
-# print(f"Exact optimal ofv: {exact_ofv}")
-# print(f"Exact time taken: {round(exact_time_end - exact_time_start)}")
-
 NUM_RUNS = 5  # Number of times the Master Algorithm is run for each configuration
 tuning_start = time.perf_counter()
 parameters = [
@@ -524,7 +510,7 @@ with pd.ExcelWriter(
 # Performing the individual runs
 for j in range(NUM_RUNS):
     print("")
-    print(datetime.now().time())
+    print(f"Started at {datetime.now().time()}\n")
     print(f"RUN {j + 1}")
     
     # Reset stored fitnesses and strategies from previous runs
@@ -553,3 +539,20 @@ tuning_end = time.perf_counter()
     
 print("")
 print(f"Time taken for tuning: {round(tuning_end - tuning_start)}")
+
+
+# Solving exactly only needs to be done once, so that the exact solving time can be found
+# print("")
+# print(f"Solving exactly...")
+# exact_time_start = time.perf_counter()
+# leader_exact = find_leader_exact()
+# exact_time_end = time.perf_counter()
+# exact_response = {s: find_follower_exact(leader_exact, s) for s in scenarios}
+# exact_ofv = master_objective_fun_k(
+#     leader_exact, {s: exact_response[s] for s in scenarios}
+# )
+# print("")
+# print(f"Exact optimal ofv: {exact_ofv}")
+# print(f"Exact time taken: {round(exact_time_end - exact_time_start)}")
+# print(f"Leader exact: {leader_exact}")
+# print(f"Exact response: {exact_response}")
