@@ -1,5 +1,7 @@
 """ Performs parameter tuning for the Master Algorithm """
 
+# Results are outputted to an excel file "Parameter tuning.xlsx" in sheet "Configurations".
+
 
 import time
 from datetime import datetime
@@ -500,7 +502,7 @@ with pd.ExcelWriter(
 ) as writer:
     parameters_df.to_excel(
         writer,
-        sheet_name="Sheet5",
+        sheet_name="Configurations",
         index=False,
         header=False,
         startrow=1,
