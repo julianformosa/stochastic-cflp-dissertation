@@ -375,7 +375,7 @@ def generate_neighbourhood(k_current: dict, player: str, k_leader: dict) -> list
 def best_from_list(lst: list, player: str, k_leader: dict, s: int) -> dict:
     """
     Selects the best action from a list of actions using the appropriate fitness function.
-     
+    
     lst is the list of action.
     player is the one the actions in lst belong to.
     If player is Follower, k_leader is Leader's action and s is the scenario.
